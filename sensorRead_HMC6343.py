@@ -12,7 +12,9 @@ __email__ = ""
 __status__ = ""
 
 import smbus
+import smbus2
 import time
+import Adafruit_GPIO.I2C as I2C
 
 ## HMC6343 I2C Address (0x32 >> 1 = 0x19)
 HMC6343_I2C_ADDR = 0x19
@@ -62,18 +64,47 @@ WRITE_EEPROM = 0xF1
 LEVEL = 0     ## X = forward, +Z = up (default)
 SIDEWAYS = 1  ## X = forward, +Y = up
 FLATFRONT = 2 ## Z = forward, -X = up
-
-
-i2cBus = smbus.SMBus(1)
-
-def confirmAddress():
-	addressRead = i2cBus.read_byte_data(HMC6343_I2C_ADDR, SLAVE_ADDR)
-	print addressRead
-	if(addressRead == HMC6343_I2C_ADDR):
-		print "Address confirmed"
-	else:
-		print "Address not confirmed"
 		
-		
-confirmAddress()		
+# I2C.require_repeated_start()
+
+bus = smbus.SMBus(1)
+bus2 = smbus2.SMBus(1)
+
+defaultBusNum = I2C.get_default_bus()
+deviceHMC6343 = I2C.get_i2c_device(HMC6343_I2C_ADDR, defaultBusNum)
+
+# readAddress = deviceHMC6343.readU8(SLAVE_ADDR)
+# readSwVer = deviceHMC6343.readU8(SW_VERSION)
+# busRead = deviceHMC6343.readRaw8()
+# readHeading = deviceHMC6343.readList(POST_HEADING, 6)
+
+readAddress = bus.read_byte_data(HMC6343_I2C_ADDR, SLAVE_ADDR)
+bus.close
+print readAddress
+
+readAddress = bus2.read_byte_data(HMC6343_I2C_ADDR, SLAVE_ADDR)
+bus2.close
+print readAddress
+
+
+
+#readAddress = bus.read_block_data(HMC6343_I2C_ADDR, SLAVE_ADDR)
+#print readAddress
+#readAddress = bus.read_i2c_block_data(HMC6343_I2C_ADDR, SLAVE_ADDR)
+#print readAddress
+
+
+#readHeading = bus.read_i2c_block_data(HMC6343_I2C_ADDR, POST_HEADING)
+#print readHeading
+#heading = (readHeading[0]*256 + readHeading[1])/10.0
+#print readHeading[0]
+#print readHeading[1]
+#print heading
+
+#readAccel = bus.read_i2c_block_data(HMC6343_I2C_ADDR, POST_ACCEL)
+#print readAccel
+#accelX = (readHeading[0]*256 + readHeading[1])
+#print readHeading[0]
+#print readHeading[1]
+#print accelX
 	
